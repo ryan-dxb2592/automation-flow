@@ -16,7 +16,7 @@ const PageLayout = ({ children }: { children: React.ReactNode }) => {
         isMobile && "top-16 left-0"
       )}
     >
-      <div className="p-2">{children}</div>
+      {children}
     </main>
   );
 };

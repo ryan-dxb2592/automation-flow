@@ -1,16 +1,9 @@
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { waitFor } from "@/lib/helpers/waitFor";
 import { InboxIcon } from "lucide-react";
 import { Suspense } from "react";
+import CreateWorkflowDialog from "./_components/create-workflow-dialog";
 
-const WorkflowPage = async ({
-  params,
-}: {
-  params: Promise<{ workflowId: string }>;
-}) => {
-  const { workflowId } = await params;
-
+const WorkflowPage = async () => {
   return (
     <div className="flex flex-1 flex-col h-full">
       <div className="flex items-center justify-between">
@@ -18,9 +11,7 @@ const WorkflowPage = async ({
           <h1 className="text-2xl font-bold">Workflows</h1>
           <p className="text-sm text-muted-foreground">Manage your workflows</p>
         </div>
-        <div>
-          <Button>Create Workflow</Button>
-        </div>
+        <CreateWorkflowDialog triggerText="Create Workflow" />
       </div>
 
       {/* Suspense */}
@@ -58,9 +49,10 @@ const UserWorkflows = async () => {
         <div className="flex flex-col gap-1 text-center">
           <p className="text-lg font-medium">No workflows created yet</p>
           <p className="text-sm text-muted-foreground">
-            Click on the button above to create a new workflow
+            Click on the button below to create your first workflow
           </p>
         </div>
+        <CreateWorkflowDialog triggerText="Create your first workflow" />
       </div>
     );
   }
