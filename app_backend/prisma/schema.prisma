@@ -35,9 +35,10 @@ model User {
   // Google OAuth fields
   googleId String? @unique @map("google_id")
 
-  profile  Profile?
-  roles    Role[]    @default([USER])
-  sessions Session[]
+  profile   Profile?
+  roles     Role[]     @default([USER])
+  sessions  Session[]
+  workflows Workflow[]
 
   // New relations for verification tables
   emailVerification  EmailVerification?
@@ -137,4 +138,24 @@ model TwoFactorToken {
   @@unique([userId, type])
   @@index([userId, type, expiresAt])
   @@map("two_factor_tokens")
+}
+
+// Workflow
+model Workflow {
+  id          String  @id @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  description String?
+
+  definition String
+  status     String
+
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Cannot have two workflows with the same name
+  @@unique([userId, name])
+  @@map("workflows")
 }
