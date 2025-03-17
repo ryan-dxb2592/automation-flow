@@ -1,7 +1,8 @@
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { TaskRegistry } from "@/lib/workflow/task/registry";
 import { TaskType } from "@/types/task-type";
-import { CoinsIcon } from "lucide-react";
+import { CoinsIcon, GripVertical } from "lucide-react";
 
 const NodeHeader = ({ taskType }: { taskType: TaskType }) => {
   const task = TaskRegistry[taskType];
@@ -18,6 +19,13 @@ const NodeHeader = ({ taskType }: { taskType: TaskType }) => {
             <CoinsIcon size={16} />
             TODO
           </Badge>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="cursor-grab drag-handle"
+          >
+            <GripVertical size={20} />
+          </Button>
         </div>
       </div>
     </div>

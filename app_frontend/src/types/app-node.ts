@@ -1,5 +1,5 @@
 import { Node } from "@xyflow/react";
-import { TaskType } from "./task-type";
+import { TaskInput, TaskType } from "./task-type";
 
 export interface AppNodeData {
   type: TaskType;
@@ -9,4 +9,10 @@ export interface AppNodeData {
 }
 export interface AppNode extends Node {
   data: AppNodeData;
+}
+
+export interface AppNodeInput {
+  input: TaskInput;
+  value: string;
+  updateNodeInput: (value: string) => void;
 }

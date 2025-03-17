@@ -9,6 +9,7 @@ export const CreateFlowNode = (
   return {
     id: uuidv4(),
     type: "AutomationNode",
+    dragHandle: ".drag-handle",
     position: position ?? { x: 0, y: 0 },
     data: {
       type: nodeType,
