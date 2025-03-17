@@ -5,14 +5,22 @@ export const PageToHtmlTask = {
   type: TaskType.PAGE_TO_HTML,
   label: "Get HTML from URL",
   icon: (props: LucideProps) => <Code {...props} />,
-  isEntryPoint: true,
+  isEntryPoint: false,
   inputs: [
     {
       name: "Webpage URL",
       type: TaskParamType.BROWSER_INSTANCE,
-      helperText: "eg: https://www.google.com",
       required: true,
-      hideHandle: true,
+    },
+  ],
+  output: [
+    {
+      name: "HTML",
+      type: TaskParamType.STRING,
+    },
+    {
+      name: "Webpage URL",
+      type: TaskParamType.BROWSER_INSTANCE,
     },
   ],
 };

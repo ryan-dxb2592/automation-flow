@@ -13,7 +13,7 @@ export enum TaskParamType {
   BROWSER_INSTANCE = "BROWSER_INSTANCE",
 }
 
-export interface TaskInput {
+export interface TaskParam {
   name: string;
   type: TaskParamType;
   helperText?: string;

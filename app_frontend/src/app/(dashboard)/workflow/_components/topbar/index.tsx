@@ -12,7 +12,7 @@ const Topbar = ({
   workflowId: string;
 }) => {
   return (
-    <header className="flex px-2 border-p-2 border-separate items-center justify-between w-full h-[60px] sticky top-0 bg-background z-10">
+    <header className="flex px-2 border-b-2 border-separate items-center justify-between w-full h-[60px] sticky top-0 bg-background z-10">
       <div className="flex flex-1 gap-1">
         <Button variant="ghost" size="icon">
           <ChevronLeft size={20} />

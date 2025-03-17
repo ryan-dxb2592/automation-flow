@@ -1,16 +1,17 @@
 "use client";
 
-import { TaskInput, TaskParamType } from "@/types/task-type";
+import { TaskParam, TaskParamType } from "@/types/task-type";
 import StringParam from "./param/string-param";
 import { useReactFlow } from "@xyflow/react";
 import { AppNode } from "@/types/app-node";
 import { useCallback } from "react";
+import BrowserInstanceParam from "./param/browser-instance-param";
 
 const NodeParamField = ({
   input,
   nodeId,
 }: {
-  input: TaskInput;
+  input: TaskParam;
   nodeId: string;
 }) => {
   const { updateNodeData, getNode } = useReactFlow();
@@ -31,6 +32,8 @@ const NodeParamField = ({
   switch (input.type) {
     case TaskParamType.STRING:
       return <StringParam params={{ input, value, updateNodeInput }} />;
+    case TaskParamType.BROWSER_INSTANCE:
+      return <BrowserInstanceParam params={{ input, updateNodeInput }} />;
     default:
       return (
         <div>

@@ -2,6 +2,7 @@ import { ReactFlowProvider } from "@xyflow/react";
 import FlowEditor from "./flow-editor";
 import Topbar from "./topbar";
 import { WorkflowType } from "@/types/workflow";
+import TaskMenu from "./task-menu";
 
 const Editor = ({ workflow }: { workflow: WorkflowType }) => {
   return (
@@ -13,7 +14,8 @@ const Editor = ({ workflow }: { workflow: WorkflowType }) => {
           workflowId={workflow?.id ?? "new"}
         />
         <section className="flex h-full overflow-auto flex-1">
-          <FlowEditor />
+          <TaskMenu />
+          <FlowEditor workflow={workflow} />
         </section>
       </div>
     </ReactFlowProvider>

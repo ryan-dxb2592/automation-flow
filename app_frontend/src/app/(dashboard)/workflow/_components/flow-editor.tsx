@@ -10,15 +10,24 @@ import {
   BackgroundVariant,
   FitViewOptions,
   useReactFlow,
+  Connection,
+  addEdge,
+  Edge,
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
 import NodeComponent from "./nodes/node-component";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { WorkflowType } from "@/types/workflow";
+import { AppNode } from "@/types/app-node";
+import DeletableEdge from "./edges/deletable-edge";
 
 const nodeTypes = {
   AutomationNode: NodeComponent,
+};
+
+const edgeTypes = {
+  defaukt: DeletableEdge,
 };
 
 // Snap to grid
@@ -32,11 +41,11 @@ const fitViewOptions: FitViewOptions = {
 };
 
 const FlowEditor = ({ workflow }: { workflow: WorkflowType }) => {
-  const [nodes, setNodes, onNodeChange] = useNodesState([
+  const [nodes, setNodes, onNodeChange] = useNodesState<AppNode>([
     CreateFlowNode(TaskType.LAUNCH_BROWSER),
   ]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const { setViewport } = useReactFlow();
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+  const { setViewport, screenToFlowPosition } = useReactFlow();
 
   //  Once we connect to the database, we need to load the workflow definition
   // useEffect(() => {
@@ -55,6 +64,37 @@ const FlowEditor = ({ workflow }: { workflow: WorkflowType }) => {
   //   }
   // }, [setNodes, setEdges, workflow]);
 
+  // On Drag Over
+  const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  }, []);
+
+  const onDrop = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      const taskType = event.dataTransfer.getData("application/reactflow");
+
+      if (!taskType || typeof taskType === "undefined") return;
+
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+
+      const newNode = CreateFlowNode(taskType as TaskType, position);
+      setNodes((nds) => nds.concat(newNode));
+    },
+    [setNodes, screenToFlowPosition]
+  );
+
+  const onConnect = useCallback(
+    (connection: Connection) => {
+      setEdges((eds) => addEdge({ ...connection, animated: true }, eds));
+    },
+    [setEdges]
+  );
+
   return (
     <main className="flex flex-col h-full w-full overflow-hidden ">
       <ReactFlow
@@ -63,10 +103,14 @@ const FlowEditor = ({ workflow }: { workflow: WorkflowType }) => {
         onNodesChange={onNodeChange}
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         snapGrid={snapGrid}
         fitViewOptions={fitViewOptions}
         snapToGrid
         fitView
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        onConnect={onConnect}
       >
         <Controls position="top-left" fitViewOptions={fitViewOptions} />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
