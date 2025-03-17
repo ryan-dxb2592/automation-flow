@@ -4,7 +4,7 @@ import { Handle, Position } from "@xyflow/react";
 import { ColorForHandle } from "./common";
 
 const NodeOutputs = ({ children }: { children: React.ReactNode }) => {
-  return <div className="flex flex-col divide-y gap-2">{children}</div>;
+  return <div className="flex flex-col divide-y ">{children}</div>;
 };
 
 const NodeOutput = ({ output }: { output: TaskParam }) => {

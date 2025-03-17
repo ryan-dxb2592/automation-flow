@@ -13,6 +13,7 @@ import {
   Connection,
   addEdge,
   Edge,
+  getOutgoers,
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
@@ -21,13 +22,14 @@ import { useCallback, useEffect } from "react";
 import { WorkflowType } from "@/types/workflow";
 import { AppNode } from "@/types/app-node";
 import DeletableEdge from "./edges/deletable-edge";
+import { TaskRegistry } from "@/lib/workflow/task/registry";
 
 const nodeTypes = {
   AutomationNode: NodeComponent,
 };
 
 const edgeTypes = {
-  defaukt: DeletableEdge,
+  default: DeletableEdge,
 };
 
 // Snap to grid
@@ -45,7 +47,7 @@ const FlowEditor = ({ workflow }: { workflow: WorkflowType }) => {
     CreateFlowNode(TaskType.LAUNCH_BROWSER),
   ]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-  const { setViewport, screenToFlowPosition } = useReactFlow();
+  const { setViewport, updateNodeData, screenToFlowPosition } = useReactFlow();
 
   //  Once we connect to the database, we need to load the workflow definition
   // useEffect(() => {
@@ -91,10 +93,78 @@ const FlowEditor = ({ workflow }: { workflow: WorkflowType }) => {
   const onConnect = useCallback(
     (connection: Connection) => {
       setEdges((eds) => addEdge({ ...connection, animated: true }, eds));
+
+      // If the edge is not connected to a node, then return
+      if (!connection.targetHandle) return;
+
+      // Remove input value from the node if it is connected to a source node
+      const node = nodes.find((n) => n.id === connection.target);
+
+      if (!node) return;
+
+      const nodeInputs = node.data.inputs;
+
+      if (!nodeInputs) return;
+
+      // Better Solution is to delete the target handle from the node
+      // delete nodeInputs[connection.targetHandle];
+
+      updateNodeData(node.id, {
+        inputs: {
+          ...nodeInputs,
+          [connection.targetHandle]: "",
+        },
+      });
+      // console.log("Updated node inputs", node.id);
     },
-    [setEdges]
+    [nodes, setEdges, updateNodeData]
   );
 
+  const isValidConnection = useCallback(
+    (connection: Edge | Connection) => {
+      // No self Connection
+      if (connection.source === connection.target) return false;
+
+      //  Same Task Type Connection
+      const sourceNode = nodes.find((n) => n.id === connection.source);
+      const targetNode = nodes.find((n) => n.id === connection.target);
+
+      if (!sourceNode || !targetNode) return false;
+
+      const sourceTask = TaskRegistry[sourceNode.data.type];
+      const targetTask = TaskRegistry[targetNode.data.type];
+
+      const output = sourceTask.output.find(
+        (o) => o.name === connection.sourceHandle
+      );
+      const input = targetTask.inputs.find(
+        (i) => i.name === connection.targetHandle
+      );
+
+      if (!output || !input) return false;
+
+      if (output.type !== input.type) return false;
+
+      // Prevent Cycle Connection
+
+      const hasCycle = (node: AppNode, visited = new Set()) => {
+        if (visited.has(node.id)) return false;
+        visited.add(node.id);
+
+        for (const outgoer of getOutgoers(node, nodes, edges)) {
+          if (outgoer.id === connection.source) return true;
+          if (hasCycle(outgoer, visited)) return true;
+        }
+      };
+
+      const detectedCycle = hasCycle(targetNode);
+
+      return !detectedCycle;
+    },
+    [nodes, edges]
+  );
+
+  // console.log("Nodes", nodes);
   return (
     <main className="flex flex-col h-full w-full overflow-hidden ">
       <ReactFlow
@@ -111,6 +181,7 @@ const FlowEditor = ({ workflow }: { workflow: WorkflowType }) => {
         onDrop={onDrop}
         onDragOver={onDragOver}
         onConnect={onConnect}
+        isValidConnection={isValidConnection}
       >
         <Controls position="top-left" fitViewOptions={fitViewOptions} />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />

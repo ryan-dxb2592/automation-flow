@@ -33,7 +33,7 @@ const NodeCard = ({ nodeId, children, isSelected }: NodeCardProps) => {
         });
       }}
       className={cn(
-        "rounded-md cursor-grab bg-background border-2 border-separate w-96 text-xs gap-1 flex flex-col",
+        "rounded-md cursor-grab bg-background border-2 border-separate w-96 text-xs  flex flex-col",
         isSelected && "border-blue-500"
       )}
     >
