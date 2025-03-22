@@ -22,4 +22,4 @@ const initialFlow: {nodes: AppNode[]; edges:Edge[]} = {
 intialFlow.nodes.push(CreateFlowNode(TaskType.LAUNCH_BROWSER))
 
 
-YT - 3:30
+YT - 4:12
